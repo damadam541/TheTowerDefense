@@ -16,20 +16,20 @@ public class Main extends JFrame implements ActionListener {
 	final static int WIN = 720;
 	final static int SIZE = 16;
 
-	PlayingField panel;
+	PlayingField gamePanel;
 	static int[][] field = new int[SIZE][SIZE];
-	
+
 	private int boxW, boxH;
-	
+
 	Timer timer;
 	final int timerSpeed = 1;
-	
+
 	final static int path = 1;
 	final static int pathStart = 2;
 	final static int pathEnd = -1;
-	
+
 	int wave = 1;
-	
+
 	ArrayList<Enemies> enemies = new ArrayList<Enemies>();
 
 	public static void main(String[] args) {
@@ -42,10 +42,10 @@ public class Main extends JFrame implements ActionListener {
 		this.setResizable(false);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		panel = new PlayingField();
-		this.add(panel);
+		gamePanel = new PlayingField();
+		this.add(gamePanel);
 
-		panel.setPreferredSize(new Dimension(WIN,WIN));
+		gamePanel.setPreferredSize(new Dimension(WIN,WIN));
 		this.pack();
 		this.setLocationRelativeTo(null);
 
@@ -53,12 +53,12 @@ public class Main extends JFrame implements ActionListener {
 		timer = new Timer(timerSpeed,this);
 		timer.start();
 	}
-	
+
 	void initBox() {
 		boxW = (int) ((WIN/SIZE) + 0.5);
 		boxH = (int) ((WIN/SIZE) + 0.5);
 	}
-	
+
 	void lvl1() {
 		field[0][5] = pathStart;
 		for (int i = 1 ; i < 3 ; i++) {
@@ -90,23 +90,17 @@ public class Main extends JFrame implements ActionListener {
 		}
 		field[15][13] = pathEnd;
 	}
-	
-	void spawnEnemies() {
-		int spawnX = 0;
-		int spawnY = 0;
-		for (int x = 0 ; x < SIZE ; x++) {
-			for (int y = 0 ; y < SIZE ; y++) {
-				if (field[x][y] == pathStart) {
-					spawnX = field[x][y]*(boxW+10);
-					spawnY = field[x][y]*(boxH+10);
-				}
-			}
-		}
-		if (wave == 1) {
-			for (int i = 0 ; i < (Math.pow(2, wave)) ; i++) {
-				enemies.add(new Enemies(spawnX,spawnY,"small"));
-			}
-		}
+
+	void moveEnemies(int i) {
+		int x = enemies.get(i).x;
+		int y = enemies.get(i).y;
+		int vx = enemies.get(i).vx;
+		int vy = enemies.get(i).vy;
+
+		x = x + vx;
+
+		enemies.get(i).x = x;
+		enemies.get(i).y = y;
 	}
 
 	private class PlayingField extends JPanel {
@@ -115,7 +109,7 @@ public class Main extends JFrame implements ActionListener {
 			this.setBackground(Color.BLACK); //light gray
 			initBox();
 			lvl1();
-			spawnEnemies();
+			new Spawn().start();
 		}
 
 		@Override
@@ -130,7 +124,7 @@ public class Main extends JFrame implements ActionListener {
 				g2.drawLine(i*boxW, 0 , i*boxW, WIN);
 				g2.drawLine(0, i*boxH, WIN , i*boxH);
 			}
-			
+
 			for (int x = 0 ; x < SIZE ; x++) {
 				for (int y = 0 ; y < SIZE ; y++) {
 					if (field[x][y] == path) {
@@ -147,7 +141,7 @@ public class Main extends JFrame implements ActionListener {
 					}
 				}
 			}
-			
+
 			//GRID DEBUG
 			g2.setColor(Color.WHITE);
 			for (int x = 0 ; x < SIZE ; x++) {
@@ -155,31 +149,45 @@ public class Main extends JFrame implements ActionListener {
 					g2.drawString(x+" "+y, x*boxW+10, y*boxH+20);
 				}
 			}
-			
+
 			for (int i = 0 ; i < enemies.size() ; i++) {
 				g2.fillRect(enemies.get(i).x,enemies.get(i).y,enemies.get(i).width,enemies.get(i).height);
 			}
 
 		}
-		
+
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		for (int i = 0 ; i < enemies.size() ; i++) {
-			int x = enemies.get(i).x;
-			int y = enemies.get(i).y;
-			int vx = enemies.get(i).vx;
-			int vy = enemies.get(i).vy;
-			
-			x = x + vx;
-			
-			enemies.get(i).x = x;
-			enemies.get(i).y = y;
-			
+			moveEnemies(i);
 		}
-		
-		
-		panel.repaint();
+
+
+		gamePanel.repaint();
+	}
+
+	class Spawn extends Thread {
+		public void run() {
+			while (enemies.size() < Math.pow(2, wave)) {
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {}
+				int spawnX = 0;
+				int spawnY = 0;
+				for (int x = 0 ; x < SIZE ; x++) {
+					for (int y = 0 ; y < SIZE ; y++) {
+						if (field[x][y] == pathStart) {
+							spawnX = x*boxW-boxW;
+							spawnY = y*boxW+(boxW/2);
+						}
+					}
+				}
+				if (wave == 1) {
+					enemies.add(new Enemies(spawnX,spawnY,"small"));
+				}
+			}
+		}
 	}
 }

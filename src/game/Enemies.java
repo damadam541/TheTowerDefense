@@ -12,10 +12,10 @@ public class Enemies extends Rectangle {
 	Enemies(int x, int y, String type){
 		this.x = x;
 		this.y = y;
-		setVelocity(type);
+		setEnemyType(type);
 	}
 	
-	void setVelocity(String type) {
+	void setEnemyType(String type) {
 		if (type.equals("small")) {
 			width = 10;
 			height = 10;

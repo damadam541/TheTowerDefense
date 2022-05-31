@@ -17,7 +17,7 @@ public class Main extends JFrame implements ActionListener {
 	final static int SIZE = 16;
 
 	PlayingField panel;
-	int[][] field = new int[SIZE][SIZE];
+	static int[][] field = new int[SIZE][SIZE];
 	
 	private int boxW, boxH;
 	
@@ -96,9 +96,9 @@ public class Main extends JFrame implements ActionListener {
 		int spawnY = 0;
 		for (int x = 0 ; x < SIZE ; x++) {
 			for (int y = 0 ; y < SIZE ; y++) {
-				if (field[x][y] == 2) {
-					spawnX = field[x][y]*boxW;
-					spawnY = field[x][y]*boxH;
+				if (field[x][y] == pathStart) {
+					spawnX = field[x][y]*(boxW+10);
+					spawnY = field[x][y]*(boxH+10);
 				}
 			}
 		}
@@ -113,9 +113,9 @@ public class Main extends JFrame implements ActionListener {
 
 		PlayingField(){
 			this.setBackground(Color.BLACK); //light gray
-			spawnEnemies();
 			initBox();
 			lvl1();
+			spawnEnemies();
 		}
 
 		@Override
@@ -125,40 +125,39 @@ public class Main extends JFrame implements ActionListener {
 			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
 			//drawGrid
-			g.setColor(Color.WHITE);
+			g2.setColor(Color.WHITE);
 			for (int i = 0; i < SIZE ; i++) {
-				g.drawLine(i*boxW, 0 , i*boxW, WIN);
-				g.drawLine(0, i*boxH, WIN , i*boxH);
+				g2.drawLine(i*boxW, 0 , i*boxW, WIN);
+				g2.drawLine(0, i*boxH, WIN , i*boxH);
 			}
 			
 			for (int x = 0 ; x < SIZE ; x++) {
 				for (int y = 0 ; y < SIZE ; y++) {
 					if (field[x][y] == path) {
-						g.setColor(Color.GRAY);
-						g.fillRect(x*boxW, y*boxH, boxW, boxH);
+						g2.setColor(Color.GRAY);
+						g2.fillRect(x*boxW, y*boxH, boxW, boxH);
 					}
 					if (field[x][y] == pathStart) {
-						g.setColor(Color.GREEN);
-						g.fillRect(x*boxW, y*boxH, boxW, boxH);
+						g2.setColor(Color.GREEN);
+						g2.fillRect(x*boxW, y*boxH, boxW, boxH);
 					}
 					if (field[x][y] == pathEnd) {
-						g.setColor(Color.RED);
-						g.fillRect(x*boxW, y*boxH, boxW, boxH);
+						g2.setColor(Color.RED);
+						g2.fillRect(x*boxW, y*boxH, boxW, boxH);
 					}
 				}
-			}
-			
-			g2.setColor(Color.WHITE);
-			for (int i = 0 ; i < enemies.size() ; i++) {
-				g2.fill(enemies.get(i));
 			}
 			
 			//GRID DEBUG
-			g.setColor(Color.WHITE);
+			g2.setColor(Color.WHITE);
 			for (int x = 0 ; x < SIZE ; x++) {
 				for (int y = 0 ; y < SIZE ; y ++) {
-					g.drawString(x+" "+y, x*boxW+10, y*boxH+20);
+					g2.drawString(x+" "+y, x*boxW+10, y*boxH+20);
 				}
+			}
+			
+			for (int i = 0 ; i < enemies.size() ; i++) {
+				g2.fillRect(enemies.get(i).x,enemies.get(i).y,enemies.get(i).width,enemies.get(i).height);
 			}
 
 		}
@@ -167,7 +166,7 @@ public class Main extends JFrame implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		/*for (int i = 0 ; i < enemies.size() ; i++) {
+		for (int i = 0 ; i < enemies.size() ; i++) {
 			int x = enemies.get(i).x;
 			int y = enemies.get(i).y;
 			int vx = enemies.get(i).vx;
@@ -178,17 +177,8 @@ public class Main extends JFrame implements ActionListener {
 			enemies.get(i).x = x;
 			enemies.get(i).y = y;
 			
-		}*/
+		}
 		
-		int x = enemies.get(0).x;
-		int y = enemies.get(0).y;
-		int vx = enemies.get(0).vx;
-		int vy = enemies.get(0).vy;
-		
-		x = x + vx;
-		
-		enemies.get(0).x = x;
-		enemies.get(0).y = y;
 		
 		panel.repaint();
 	}

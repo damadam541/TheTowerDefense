@@ -97,7 +97,8 @@ public class Main extends JFrame implements ActionListener {
 		int vx = enemies.get(i).vx;
 		int vy = enemies.get(i).vy;
 
-		x = x + vx;
+		
+		
 
 		enemies.get(i).x = x;
 		enemies.get(i).y = y;
